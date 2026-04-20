@@ -1,0 +1,28 @@
+services:
+  emlinux3-sdk:
+    image: emlinux3-sdk
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        uid: ${UID:-1000}
+        http_proxy: $http_proxy
+        https_proxy: $https_proxy
+        ftp_proxy: $ftp_proxy
+        no_proxy: $no_proxy
+    environment:
+      - http_proxy=$http_proxy
+      - https_proxy=$https_proxy
+      - ftp_proxy=$ftp_proxy
+      - no_proxy=$no_proxy
+    volumes:
+      - /proc:/proc:rw
+      - /dev/shm:/dev/shm:rw
+      - $HOME:/host-home:rw
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+    user: sdkuser
+    command: /bin/bash -l
