@@ -1,0 +1,41 @@
+#
+# Copyright (c) Cybertrust Japan Co., Ltd.
+#
+# SPDX-License-Identifier: MIT
+#
+
+DESCRIPTION = "Sample initramfs module"
+MAINTAINER = "Your name here <you@domain.com>"
+DEBIAN_DEPENDS = "initramfs-tools"
+
+# If the conf-hook enables BUSYBOX=y, busybox is needed:
+DEBIAN_DEPENDS .= ", busybox, file"
+
+SRC_URI = " \
+    file://emlinux.conf-hook \
+    file://emlinux.hook \
+    file://emlinux.script \
+    "
+
+inherit dpkg-raw
+
+do_install[cleandirs] += " \
+    ${D}/usr/share/initramfs-tools/conf-hooks.d \
+    ${D}/usr/share/initramfs-tools/hooks \
+    ${D}/usr/share/initramfs-tools/scripts/local-top \
+    "
+
+do_install() {
+    # See "CONFIGURATION HOOK SCRIPTS" in initramfs-tools(7) for details.
+    install "${WORKDIR}/emlinux.conf-hook" \
+        "${D}/usr/share/initramfs-tools/conf-hooks.d/emlinux"
+
+    # See "HOOK SCRIPTS" in initramfs-tools(7) for details.
+    install "${WORKDIR}/emlinux.hook" \
+        "${D}/usr/share/initramfs-tools/hooks/emlinux"
+
+    # Note that there are other places where a boot script might be deployed to,
+    # apart from local-top.  See "BOOT SCRIPTS" in initramfs-tools(7) for details.
+    install "${WORKDIR}/emlinux.script" \
+        "${D}/usr/share/initramfs-tools/scripts/local-top/emlinux.script"
+}
